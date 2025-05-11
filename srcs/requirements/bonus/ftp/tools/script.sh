@@ -1,30 +1,30 @@
 #!/bin/bash
 
-# Set default FTP user and password
-FTP_USER=${FTP_USER:-ftpuser}
-FTP_PASS=${FTP_PASS:-ftppassword}
-FTP_ROOT_DIR=${FTP_ROOT_DIR:-/var/ftp/pub}
+FTP_USER="$FTP_USER"
+FTP_PASS=$(cat /run/secrets/ftp_password)
+FTP_ROOT_DIR="$FTP_ROOT_DIR"
 
-# Create the FTP user if it doesn't exist
-if ! id "$FTP_USER" &>/dev/null; then
-    useradd -d $FTP_ROOT_DIR $FTP_USER
-fi
+useradd -m -d "$FTP_ROOT_DIR" "$FTP_USER"
 
-# Set the FTP user's password
 echo "$FTP_USER:$FTP_PASS" | chpasswd
 
-# Create the FTP root directory
-mkdir -p $FTP_ROOT_DIR
-chown -R $FTP_USER:$FTP_USER $FTP_ROOT_DIR
+mkdir -p "$FTP_ROOT_DIR"
+chown -R "$FTP_USER:$FTP_USER" "$FTP_ROOT_DIR"
 
-# vsftpd configuration
 cat <<EOF > /etc/vsftpd.conf
+listen=YES
 anonymous_enable=NO
 local_enable=YES
+listen_ipv6=NO
 write_enable=YES
+local_umask=022
+allow_writeable_chroot=YES
+connect_from_port_20=YES
+pasv_enable=YES
+pasv_min_port=2000
+pasv_max_port=2100
+ftpd_banner=Welcome to my FTP service.
 local_root=$FTP_ROOT_DIR
-listen=YES
 EOF
 
-# Start vsftpd in the foreground
 exec vsftpd /etc/vsftpd.conf

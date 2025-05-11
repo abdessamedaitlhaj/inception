@@ -1,105 +1,149 @@
-version: "3.8"
-
 services:
+
   mariadb:
     build: ./requirements/mariadb
     image: mariadb:aait-lha
     container_name: mariadb
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env
+    secrets:
+      - db_password
+      - db_root_password
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
-      - app-network
+      - inception
 
   wordpress:
     build: ./requirements/wordpress
     image: wordpress:aait-lha
     container_name: wordpress
+    depends_on:
+      - mariadb
     restart: always
     env_file:
       - .env
+    secrets:
+      - db_password
+      - wp_admin_password
+      - wp_user_password
     volumes:
       - wordpress_data:/var/www/wordpress
     networks:
-      - app-network
-    depends_on:
-      - mariadb
+      - inception
 
   nginx:
     build: ./requirements/nginx
     image: nginx:aait-lha
     container_name: nginx
+    depends_on:
+      - wordpress
     restart: always
+    env_file:
+      - .env
     ports:
       - "443:443"
     volumes:
       - ./requirements/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot:/etc/letsencrypt
       - wordpress_data:/var/www/wordpress
     networks:
-      - app-network
-    depends_on:
-      - wordpress
+      - inception
+
   redis:
     build: ./requirements/bonus/redis
     image: redis:aait-lha
     container_name: redis
     restart: always
-    networks:
-      - app-network
     depends_on:
       - wordpress
+    networks:
+      - inception
+
   static-website:
     build: ./requirements/bonus/static-website
     image: static-website:aait-lha
     container_name: static-website
-    networks:
-      - app-network
-    ports:
-      - "8081:80"
     restart: always
+    networks:
+      - inception
+
   adminer:
     build: ./requirements/bonus/adminer
     image: adminer:aait-lha
     container_name: adminer
     restart: always
-    env_file:
-      - .env
-    ports:
-      - 8080:8080
+    depends_on:
+      - mariadb
+      - wordpress
     networks:
-      - app-network
+      - inception
+
   ftp:
     build: ./requirements/bonus/ftp
     image: ftp:aait-lha
     container_name: ftp
     restart: always
-    env_file:
-      - .env
-    volumes:
-      - wordpress_data:/var/ftp/pub
-    networks:
-      - app-network
-  portainer:
-    build: ./requirements/bonus/portainer
-    image: portainer:aait-lha
-    container_name: portainer
-    restart: always
-    volumes:
-      - portainer_data:/data portainer/portainer-ee
-      - /var/run/docker.sock:/var/run/docker.sock
+    secrets:
+      - ftp_password
     env_file:
       - .env
     ports:
-      - "9443:9443"
+      - "21:21"
+      - "2000-2100:2000-2100"
+    volumes:
+      - ftp_data:/var/www/wordpress
     networks:
-      - app-network
+      - inception
+
+  # portainer:
+  #   build: ./requirements/bonus/portainer
+  #   image: portainer:aait-lha
+  #   container_name: portainer
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - portainer:/data
+  #   restart: always
+  #   depends_on:
+  #     - wordpress
+  #   networks:
+  #     - inception
+  #   ports:
+  #     - "9443:9443"
+  dozzle:
+    build: ./requirements/bonus/dozzle
+    image: dozzle:aait-lha
+    container_name: dozzle
+    restart: always
+    environment:
+      - DOZZLE_MODE=swarm
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 3333:8080
+    deploy:
+      mode: global
+    networks:
+      - inception
 
 volumes:
   mariadb_data:
   wordpress_data:
-  portainer_data:
+  ftp_data:
 
 networks:
-  app-network:
+  inception:
+    driver: bridge
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  wp_admin_password:
+    file: ../secrets/wp_admin_password.txt
+  wp_user_password:
+    file: ../secrets/wp_user_password.txt
+  ftp_password:
+    file: ../secrets/ftp_password.txt

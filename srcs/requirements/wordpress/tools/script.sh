@@ -1,11 +1,16 @@
 #!/bin/bash
 
-sleep 10
-curl -O -s https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar >/dev/null 2>&1
+WP_DB_PASSWORD=$(cat /run/secrets/db_password)
+WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
+WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password)
+
+sleep 5
+
+curl -O -s https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
 chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
 
-sed --in-place '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
+sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
 
 WP_PATH='/var/www/wordpress'
 mkdir -p "$WP_PATH"
@@ -16,10 +21,10 @@ wp core download --path="$WP_PATH" --allow-root
 
 mv "$WP_PATH/wp-config-sample.php" "$WP_PATH/wp-config.php"
 
-wp config set DB_NAME "$WORDPRESS_DB_NAME" --path="$WP_PATH" --allow-root
-wp config set DB_USER "$WORDPRESS_DB_USER" --path="$WP_PATH" --allow-root
-wp config set DB_PASSWORD "$WORDPRESS_DB_PASSWORD" --path="$WP_PATH" --allow-root
-wp config set DB_HOST "$WORDPRESS_DB_HOST" --path="$WP_PATH" --allow-root
+wp config set DB_NAME "$WP_DB_NAME" --path="$WP_PATH" --allow-root
+wp config set DB_USER "$WP_DB_USER" --path="$WP_PATH" --allow-root
+wp config set DB_PASSWORD "$WP_DB_PASSWORD" --path="$WP_PATH" --allow-root
+wp config set DB_HOST "$WP_DB_HOST" --path="$WP_PATH" --allow-root
 
 wp config set WP_REDIS_HOST "redis" --allow-root --path="$WP_PATH"
 wp config set WP_REDIS_PORT "6379" --allow-root --path="$WP_PATH"
@@ -34,8 +39,11 @@ wp user create	"$WP_USER" "$WP_USER_EMAIL" --role="$WP_USER_ROLE" \
 wp plugin install redis-cache --activate --allow-root --path="$WP_PATH"
 wp redis enable --allow-root --path="$WP_PATH"
 
+
+
+
+
+
 chown -R www-data:www-data "$WP_PATH"
 
 exec /usr/sbin/php-fpm7.4 -F
-
-
