@@ -2,13 +2,14 @@ FROM debian:bullseye
 
 RUN apt-get update && \
     apt-get install -y vsftpd && \
-    mkdir -p /var/run/vsftpd/empty && \
-    rm -rf /var/lib/apt/lists/*
+    mkdir -p /var/run/vsftpd/empty
 
-RUN mkdir -p /home/data/ftp
+RUN mkdir -p /home/aait-lha/data/ftp
 
-COPY tools/script.sh /
+WORKDIR /app
 
-RUN chmod +x /script.sh
+COPY tools/script.sh .
 
-ENTRYPOINT ["/script.sh"]
+RUN chmod +x script.sh
+
+ENTRYPOINT ["/app/script.sh"]

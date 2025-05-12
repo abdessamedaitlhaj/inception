@@ -4,7 +4,9 @@ WP_DB_PASSWORD=$(cat /run/secrets/db_password)
 WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
 WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password)
 
-sleep 5
+service php7.4-fpm start
+
+sleep 10
 
 curl -O -s https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
@@ -38,11 +40,6 @@ wp user create	"$WP_USER" "$WP_USER_EMAIL" --role="$WP_USER_ROLE" \
 
 wp plugin install redis-cache --activate --allow-root --path="$WP_PATH"
 wp redis enable --allow-root --path="$WP_PATH"
-
-
-
-
-
 
 chown -R www-data:www-data "$WP_PATH"
 

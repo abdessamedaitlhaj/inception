@@ -1,11 +1,13 @@
 FROM debian:bullseye
 
-RUN apt update && apt install -y mariadb-server \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y mariadb-server
 
-RUN mkdir -p /home/data/mariadb
-COPY tools/script.sh /app/script.sh
+RUN mkdir -p /home/aait-lha/data/mariadb
 
-RUN chmod +x /app/script.sh
+WORKDIR /app
+
+COPY tools/script.sh .
+
+RUN chmod +x script.sh
 
 ENTRYPOINT [ "/app/script.sh" ]

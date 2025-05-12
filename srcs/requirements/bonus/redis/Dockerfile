@@ -1,8 +1,7 @@
 FROM debian:bullseye
 
 RUN apt-get update && apt-get upgrade -y \
-	&& apt-get install -y redis vim netcat curl procps \
-	&& rm -rf /var/lib/apt/lists/*
+	&& apt-get install -y redis vim netcat curl procps
 
 RUN echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
 

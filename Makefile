@@ -1,57 +1,54 @@
-# Variables
 COMPOSE_FILE = srcs/docker-compose.yml
 PROJECT_NAME = my_project
 
-# Phony targets
-.PHONY: all up down restart logs clean help
+GREEN  = \033[0;32m
+NC     = \033[0m
 
 all: build
 
 build:
+	@echo "$(GREEN)Building and starting services with Docker Compose...$(NC)"
 	docker compose -f $(COMPOSE_FILE) -p $(PROJECT_NAME) up --build
 
 up:
+	@echo "$(GREEN)Starting services without rebuilding...$(NC)
 	docker compose -f $(COMPOSE_FILE) -p $(PROJECT_NAME) up
 
-down:
-	docker compose -f $(COMPOSE_FILE) -p $(PROJECT_NAME) down -v
-
-restart: down up
-
 stop:
-	docker stop `docker ps -qa | tr '\n' ' '`
+	@echo "$(GREEN)Stopping all running containers...$(NC)"
+	docker stop $$(docker ps -qa)
 
 rmc:
-	docker rm `docker ps -qa | tr '\n' ' '`
+	@echo "$(GREEN)Removing all stopped containers...$(NC)"
+	docker rm $$(docker ps -qa)
 
 rmi:
-	docker rmi `docker images -qa | tr '\n' ' '`
+	@echo "$(GREEN)Removing all Docker images...$(NC)"
+	docker rmi -f $$(docker images -qa)
 
 rmv:
-	docker volume rm `docker volume ls -q | tr '\n' ' '`
+	@echo "$(GREEN),Removing all Docker volumes...$(NC)"
+	docker volume rm $$(docker volume ls -q)
 
 rmn:
-	docker network rm `docker network ls -q | tr '\n' ' '`
-
-
-cache:
-	docker system prune -af
+	@echo "$(GREEN),Removing all Docker networks...$(NC)"
+	docker network rm $$(docker network ls -q)
 
 logs:
+	@echo "$(GREEN),Displaying Docker Compose logs...$(NC)"
 	docker compose -f $(COMPOSE_FILE) -p $(PROJECT_NAME) logs -f
-
-restart:
-	sudo systemctl restart docker
 
 clean: stop rmc rmi rmv rmn
 
 help:
-	@echo "Usage: make [target]"
-	@echo ""
-	@echo "Targets:"
-	@echo "  up       Start the services"
-	@echo "  down     Stop and remove the services"
-	@echo "  restart  Restart the services"
-	@echo "  logs     View logs of the services"
-	@echo "  clean    Stop the services and clean up unused resources"
-	@echo "  help     Display this help message"
+	@echo "$(BOLD)Usage: make [target]$(NC)"
+	@echo "$(GREEN)up$(NC)        - Start the services"
+	@echo "$(GREEN)build$(NC)     - Build and start the services"
+	@echo "$(GREEN)logs$(NC)      - View logs of the services"
+	@echo "$(GREEN)stop$(NC)      - Stop all containers"
+	@echo "$(GREEN)rmc$(NC)       - Remove all containers"
+	@echo "$(GREEN)rmi$(NC)       - Remove all images"
+	@echo "$(GREEN)rmv$(NC)       - Remove all volumes"
+	@echo "$(GREEN)rmn$(NC)       - Remove all networks"
+	@echo "$(GREEN)clean$(NC)     - Stop everything and remove Docker data"
+	@echo "$(GREEN)help$(NC)      - Show this help message"
