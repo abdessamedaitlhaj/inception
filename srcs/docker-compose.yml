@@ -100,25 +100,24 @@ services:
     networks:
       - inception
 
-  # portainer:
-  #   build: ./requirements/bonus/portainer
-  #   image: portainer:aait-lha
-  #   container_name: portainer
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #     - portainer:/data
-  #   restart: always
-  #   depends_on:
-  #     - wordpress
-  #   networks:
-  #     - inception
-  #   ports:
-  #     - "9443:9443"
+  uptime-kuma:
+    build: ./requirements/bonus/uptime-kuma
+    image: uptime-kuma:aait-lha
+    container_name: uptime-kuma
+    volumes:
+      - uptime_kuma_data:/home/uptimekuma/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - inception
+    ports:
+      - "3001:3001"
+    restart: unless-stopped  
 
 volumes:
   mariadb_data:
   wordpress_data:
   ftp_data:
+  uptime_kuma_data:
 
 networks:
   inception:

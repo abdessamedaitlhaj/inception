@@ -13,17 +13,17 @@ chown -R "$FTP_USER:$FTP_USER" "$FTP_ROOT_DIR"
 
 cat <<EOF > /etc/vsftpd.conf
 listen=YES
+listen_ipv6=NO
 anonymous_enable=NO
 local_enable=YES
-listen_ipv6=NO
 write_enable=YES
-local_umask=022
+chroot_local_user=YES
 allow_writeable_chroot=YES
-connect_from_port_20=YES
 pasv_enable=YES
 pasv_min_port=2000
 pasv_max_port=2100
-ftpd_banner=Welcome to my FTP service.
+pasv_address=ftp
+ftpd_banner="Welcome to FTP."
 local_root=$FTP_ROOT_DIR
 EOF
 

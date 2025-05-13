@@ -1,8 +1,7 @@
 FROM debian:bullseye
 
 RUN apt-get update && \
-    apt-get install -y vsftpd && \
-    mkdir -p /var/run/vsftpd/empty
+    apt-get install -y vsftpd
 
 RUN mkdir -p /home/aait-lha/data/ftp
 
