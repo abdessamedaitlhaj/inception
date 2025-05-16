@@ -4,10 +4,6 @@ WP_DB_PASSWORD=$(cat /run/secrets/db_password)
 WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
 WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password)
 
-service php7.4-fpm start
-
-sleep 10
-
 curl -O -s https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
 chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
@@ -16,7 +12,7 @@ sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
 
 WP_PATH='/var/www/wordpress'
 mkdir -p "$WP_PATH"
-
+mkdir -p /run/php
 chmod 755 "$WP_PATH"
 
 wp core download --path="$WP_PATH" --allow-root

@@ -1,10 +1,10 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get upgrade -y \
-	&& apt-get install -y redis vim netcat curl procps
+RUN apt update && apt upgrade -y \
+	&& apt install -y redis-server \
+	&& apt clean \
+	&& rm -rf /var/lib/apt/lists/*
 
-RUN echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
-
-ENTRYPOINT [ "redis-server", "--protected-mode", "no", 			\
-							 "--maxmemory", "256mb", 			\
-							 "--maxmemory-policy", "allkeys-lru" ]
+ENTRYPOINT [ "redis-server", "--protected-mode", "no",\
+			"--maxmemory", "256mb",\
+			"--maxmemory-policy", "allkeys-lru" ]

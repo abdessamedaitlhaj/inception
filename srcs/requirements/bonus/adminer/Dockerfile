@@ -1,7 +1,9 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y \
-    php php-mysql wget
+RUN apt update && apt install -y \
+    php php-mysql wget \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /var/www/html
 
