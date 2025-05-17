@@ -6,10 +6,12 @@ FTP_ROOT_DIR="$FTP_ROOT_DIR"
 
 useradd -m -d "$FTP_ROOT_DIR" "$FTP_USER"
 
-echo "$FTP_USER:$FTP_PASS" | chpasswd
-
 mkdir -p "$FTP_ROOT_DIR"
 chown -R "$FTP_USER:$FTP_USER" "$FTP_ROOT_DIR"
+
+
+echo "$FTP_USER:$FTP_PASS" | chpasswd
+
 
 cat <<EOF > /etc/vsftpd.conf
 listen=YES

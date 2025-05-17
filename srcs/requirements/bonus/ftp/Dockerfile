@@ -5,7 +5,7 @@ RUN apt-get update && \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /home/aait-lha/data/ftp
+RUN mkdir -p /var/run/vsftpd/empty
 
 WORKDIR /app
 

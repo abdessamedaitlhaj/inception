@@ -12,7 +12,6 @@ sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
 
 WP_PATH='/var/www/wordpress'
 mkdir -p "$WP_PATH"
-mkdir -p /run/php
 chmod 755 "$WP_PATH"
 
 wp core download --path="$WP_PATH" --allow-root
@@ -36,6 +35,8 @@ wp user create	"$WP_USER" "$WP_USER_EMAIL" --role="$WP_USER_ROLE" \
 
 wp plugin install redis-cache --activate --allow-root --path="$WP_PATH"
 wp redis enable --allow-root --path="$WP_PATH"
+
+wp theme install twentyseventeen --activate --allow-root --path="$WP_PATH"
 
 chown -R www-data:www-data "$WP_PATH"
 

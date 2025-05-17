@@ -2,9 +2,7 @@ FROM debian:bullseye
 
 RUN apt update && apt install -y mariadb-server \
     && apt clean \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /home/aait-lha/data/mariadb
+    && rm -rf /var/lib/apt/lists/*  # Remove cached APT metadata
 
 WORKDIR /app
 
