@@ -17,7 +17,7 @@ chmod 777 "$WP_PATH"
 
 wp core download --path="$WP_PATH" --allow-root
 
-if [ ! -f "$WP_PATH/wp-config-sample.php" ]; then
+if [ ! f "$WP_PATH/wp-config-sample.php" ]; then
 mv "$WP_PATH/wp-config-sample.php" "$WP_PATH/wp-config.php"
 
 wp config set DB_NAME "$WP_DB_NAME" --path="$WP_PATH" --allow-root
