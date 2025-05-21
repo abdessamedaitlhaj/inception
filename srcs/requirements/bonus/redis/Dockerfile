@@ -1,8 +1,8 @@
 FROM debian:bullseye
 
-RUN apt update && apt upgrade -y \
-	&& apt install -y redis-server \
-	&& apt clean \
+RUN apt-get update && apt-get upgrade -y
+
+RUN apt-get install -y redis-server \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT [ "redis-server", "--protected-mode", "no",\

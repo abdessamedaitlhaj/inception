@@ -11,7 +11,7 @@ build:
 	docker compose -f $(COMPOSE_FILE) -p $(PROJECT_NAME) up --build
 
 up:
-	@echo "$(GREEN)Starting services without rebuilding...$(NC)
+	@echo "$(GREEN)Starting services without rebuilding...$(NC)"
 	docker compose -f $(COMPOSE_FILE) -p $(PROJECT_NAME) up
 
 stop:

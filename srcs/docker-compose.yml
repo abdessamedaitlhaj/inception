@@ -29,7 +29,7 @@ services:
       - wp_admin_password
       - wp_user_password
     volumes:
-      - wordpress_data:/var/www/wordpress
+      - wordpress_data:/var/www/html
     networks:
       - inc
 
@@ -46,7 +46,7 @@ services:
       - "443:443"
     volumes:
       - ./requirements/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - wordpress_data:/var/www/wordpress
+      - wordpress_data:/var/www/html
     networks:
       - inc
 
@@ -94,24 +94,27 @@ services:
       - .env
     ports:
       - "21:21"
-      - "2000-2100:2000-2100"
+      - "22000-22100:22000-22100"
     volumes:
-      - ftp_data:/var/www/wordpress
+      - wordpress_data:/home/$FTP_USER/ftp
     networks:
       - inc
 
-  uptime-kuma:
-    build: ./requirements/bonus/uptime-kuma
-    image: uptime-kuma:aait-lha
-    container_name: uptime-kuma
+  cadvisor:
+    container_name: cadvisor
+    build: ./requirements/bonus/cadvisor
+    image: cadvisor:aait-lha
+    restart: always
+    ports:
+      - "8090:8080"
     volumes:
-      - uptime_kuma_data:/home/uptimekuma/data
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
     networks:
       - inc
-    ports:
-      - "3001:3001"
-    restart: unless-stopped  
 
 volumes:
   mariadb_data:
@@ -126,20 +129,6 @@ volumes:
     driver: local
     driver_opts:
       device: /home/${USER}/data/wordpress
-      o : bind
-      type : none
-  ftp_data:
-    name: ftp
-    driver: local
-    driver_opts:
-      device: /home/${USER}/data/ftp
-      o : bind
-      type : none
-  uptime_kuma_data:
-    name: uptime-kuma
-    driver: local
-    driver_opts:
-      device: /home/${USER}/data/uptime-kuma
       o : bind
       type : none
 

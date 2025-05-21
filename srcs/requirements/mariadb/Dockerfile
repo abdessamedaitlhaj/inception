@@ -1,13 +1,12 @@
 FROM debian:bullseye
 
-RUN apt update && apt install -y mariadb-server \
-    && apt clean \
-    && rm -rf /var/lib/apt/lists/*  # Remove cached APT metadata
+RUN apt-get update && apt-get upgrade -y
 
-WORKDIR /app
+RUN apt-get install -y mariadb-server netcat \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY tools/script.sh .
+COPY tools/script.sh /
 
 RUN chmod +x script.sh
 
-ENTRYPOINT [ "/app/script.sh" ]
+ENTRYPOINT [ "/script.sh" ]

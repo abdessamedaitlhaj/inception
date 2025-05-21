@@ -5,7 +5,7 @@ MARIA_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
 
 service mariadb start
 
-sleep 5
+sleep 10
 
 mariadb -e "CREATE DATABASE IF NOT EXISTS $MARIA_DATABASE" 
 mariadb -e "CREATE USER IF NOT EXISTS '$MARIA_USER'@'%' IDENTIFIED BY '$MARIA_PASSWORD'"

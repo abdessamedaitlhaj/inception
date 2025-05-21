@@ -4,18 +4,20 @@ WP_DB_PASSWORD=$(cat /run/secrets/db_password)
 WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
 WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password)
 
-curl -O -s https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+sleep 10
 
+mkdir -p /run/php
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
 chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
 
-sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
-
-WP_PATH='/var/www/wordpress'
+WP_PATH='/var/www/html'
 mkdir -p "$WP_PATH"
-chmod 755 "$WP_PATH"
+chmod 777 "$WP_PATH"
 
 wp core download --path="$WP_PATH" --allow-root
 
+if [ ! -f "$WP_PATH/wp-config-sample.php" ]; then
 mv "$WP_PATH/wp-config-sample.php" "$WP_PATH/wp-config.php"
 
 wp config set DB_NAME "$WP_DB_NAME" --path="$WP_PATH" --allow-root
@@ -37,7 +39,9 @@ wp plugin install redis-cache --activate --allow-root --path="$WP_PATH"
 wp redis enable --allow-root --path="$WP_PATH"
 
 wp theme install twentyseventeen --activate --allow-root --path="$WP_PATH"
+fi
 
 chown -R www-data:www-data "$WP_PATH"
+
 
 exec /usr/sbin/php-fpm7.4 -F
