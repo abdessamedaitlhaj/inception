@@ -83,52 +83,52 @@ services:
     networks:
       - inc
 
-  ftp:
-    build: ./requirements/bonus/ftp
-    image: ftp:aait-lha
-    container_name: ftp
-    restart: always
-    secrets:
-      - ftp_password
-    env_file:
-      - .env
-    ports:
-      - "21:21"
-      - "22000-22100:22000-22100"
-    volumes:
-      - wordpress_data:/home/$FTP_USER/ftp
-    networks:
-      - inc
+  # ftp:
+  #   build: ./requirements/bonus/ftp
+  #   image: ftp:aait-lha
+  #   container_name: ftp
+  #   restart: always
+  #   secrets:
+  #     - ftp_password
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "21:21"
+  #     - "22000-22100:22000-22100"
+  #   volumes:
+  #     - wordpress_data:/home/$FTP_USER/ftp
+  #   networks:
+  #     - inc
 
-  cadvisor:
-    container_name: cadvisor
-    build: ./requirements/bonus/cadvisor
-    image: cadvisor:aait-lha
-    restart: always
-    ports:
-      - "8090:8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
-    networks:
-      - inc
+  # cadvisor:
+  #   container_name: cadvisor
+  #   build: ./requirements/bonus/cadvisor
+  #   image: cadvisor:aait-lha
+  #   restart: always
+  #   ports:
+  #     - "8090:8080"
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:ro
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #     - /dev/disk/:/dev/disk:ro
+  #   networks:
+  #     - inc
 
 volumes:
   mariadb_data:
     name: mariadb
     driver: local
     driver_opts:
-      device: /home/${USER}/data/mariadb
+      device: ~/data/maria
       o : bind
       type : none
   wordpress_data:
     name: wordpress
     driver: local
     driver_opts:
-      device: /home/${USER}/data/wordpress
+      device: ~/data/word
       o : bind
       type : none
 

@@ -14,4 +14,4 @@ mariadb -e "FLUSH PRIVILEGES"
 
 mysqladmin -u root -p"$MARIA_ROOT_PASSWORD" shutdown
 
-exec mysqld_safe --bind_address=0.0.0.0
+mysqld_safe --port=3306 --bind-address=0.0.0.0 --datadir=/var/lib/mysql
