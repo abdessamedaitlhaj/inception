@@ -8,8 +8,6 @@ if [ -f "/var/www/html/wp-config.php" ]; then
 	exec php-fpm7.4 -F
 fi
 
-sleep 10
-
 curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
 chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
@@ -28,7 +26,7 @@ wp config create \
   --path="$WP_PATH" \
   --allow-root \
   --force
-
+  
 wp config set WP_REDIS_HOST "redis" --allow-root --path="$WP_PATH"
 wp config set WP_REDIS_PORT "6379" --allow-root --path="$WP_PATH"
 

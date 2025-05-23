@@ -2,11 +2,13 @@ FROM debian:bullseye
 
 RUN apt-get update && apt-get upgrade -y
 
-RUN apt-get install -y mariadb-server netcat \
+RUN apt-get install -y mariadb-server netcat iputils-ping \
     && rm -rf /var/lib/apt/lists/*
 
 COPY tools/script.sh /
 
 RUN chmod +x script.sh
+
+EXPOSE 3306
 
 ENTRYPOINT [ "/script.sh" ]
