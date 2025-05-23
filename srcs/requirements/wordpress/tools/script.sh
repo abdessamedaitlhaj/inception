@@ -4,9 +4,7 @@ WP_DB_PASSWORD=$(cat /run/secrets/db_password)
 WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
 WP_ADMIN_PASSWORD=$(cat /run/secrets/wp_admin_password)
 
-if [ -f "/var/www/html/wp-config.php" ]; then
-	exec php-fpm7.4 -F
-fi
+sleep 10
 
 curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
@@ -18,14 +16,12 @@ chmod 777 "$WP_PATH"
 
 wp core download --path="$WP_PATH" --allow-root
 
-wp config create \
-  --dbname="$WP_DB_NAME" \
-  --dbuser="$WP_DB_USER" \
-  --dbpass="$WP_DB_PASSWORD" \
-  --dbhost="$WP_DB_HOST" \
-  --path="$WP_PATH" \
-  --allow-root \
-  --force
+mv "$WP_PATH/wp-config-sample.php" "$WP_PATH/wp-config.php"
+
+wp config set DB_NAME "$WP_DB_NAME" --path="$WP_PATH" --allow-root
+wp config set DB_USER "$WP_DB_USER" --path="$WP_PATH" --allow-root
+wp config set DB_PASSWORD "$WP_DB_PASSWORD" --path="$WP_PATH" --allow-root
+wp config set DB_HOST "$WP_DB_HOST" --path="$WP_PATH" --allow-root
   
 wp config set WP_REDIS_HOST "redis" --allow-root --path="$WP_PATH"
 wp config set WP_REDIS_PORT "6379" --allow-root --path="$WP_PATH"

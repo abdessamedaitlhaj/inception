@@ -1,14 +1,15 @@
 COMPOSE_FILE = srcs/docker-compose.yml
 WORDPRESS_PATH = "/home/aait-lha/data/wordpress"
 MARIADB_PATH = "/home/aait-lha/data/mariadb"
-RM = rm -rf
-GREEN  = \033[0;32m
-NC     = \033[0m
+RM =rm -rf
+GREEN=\033[0;32m
+NC=\033[0m
+BOLD=\033[1m
 
 all: up
 
 up:
-	@echo "$(GREEN)Building and starting services with Docker Compose...$(NC)"
+	@echo "$(GREEN)$(BOLD)Building and starting services with Docker Compose...$(NC)"
 	@mkdir -p ${WORDPRESS_PATH}
 	@mkdir -p ${MARIADB_PATH}
 	@docker compose -f $(COMPOSE_FILE) up --build
