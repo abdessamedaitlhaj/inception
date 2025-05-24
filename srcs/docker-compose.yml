@@ -14,6 +14,11 @@ services:
       - mariadb_data:/var/lib/mysql
     networks:
       - inc
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+      interval: 3s
 
   wordpress:
     build: ./requirements/wordpress
@@ -46,8 +51,8 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ./requirements/nginx/nginx.conf:/etc/nginx/nginx.conf
       - wordpress_data:/var/www/html
+      - ./requirements/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
     networks:
       - inc
 
@@ -68,6 +73,8 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    volumes:
+      - ./requirements/bonus/static-website/tools/index.html:/var/www/html/index.html
     networks:
       - inc
 
@@ -79,7 +86,6 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mariadb
       - wordpress
     networks:
       - inc
@@ -109,11 +115,11 @@ services:
     ports:
       - "8090:8080"
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
+      - /:/rootfs:ro # 
+      - /var/run:/var/run:ro # access socket files, container states
+      - /sys:/sys:ro # access cgroup files to monitor CPU, memory ...
+      - /var/lib/docker/:/var/lib/docker:ro # metadata about docker containers,vms, ntws,,imgs
+      - /dev/disk/:/dev/disk:ro # access the block devices (disks, partitions)
     networks:
       - inc
 
@@ -148,104 +154,3 @@ secrets:
     file: ../secrets/wp_user_password.txt
   ftp_password:
     file: ../secrets/ftp_password.txt
-
-
-# Docker Compose is a tool that lets you define and run multi-container Docker\
-#  applications using a single YAML configuration file — typically docker-compose.yml.
-
-
-# How Docker Compose works (under the hood)
-# Reads docker-compose.yml
-# Translates it into multiple docker run or docker network/volume commands
-# Uses Docker Engine API to create:
-# Images (if build: is used)
-# Networks (default network unless custom)
-# Volumes (if specified)
-# Containers (with links, env vars, ports, etc.)
-# chroot is both a concept and a system call introduced in UNIX Version 7 (1979).
-
-
-# Benefits of Docker over VMs
-# Startup time =>	Milliseconds to seconds	=> Tens of seconds to minutes
-# Resource usage =>	Lightweight – shares host OS kernel	=> Heavy – runs full OS per VM
-# Portability	=> Image runs anywhere Docker runs	=> Requires matching hypervisor/OS config
-# Image layering =>	Supports copy-on-write layers	=> VM snapshots are bulkier and slower
-
-
-
-# A Docker network is a virtual network created by Docker that allows containers to communicate with:
-# Each other
-# The host system
-# The outside world (like the internet)
-# bridge, none, host, macvlan
-
-
-# NGINX (pronounced "engine-x") is a high-performance web server and reverse proxy server.
-# It's widely used to serve web pages, handle APIs, load balance
-# applications, and act as a gateway for modern web services.
-
-# SSL (Secure Sockets Layer) and TLS (Transport Layer Security)
-# are cryptographic protocols that provide secure communication over a computer network
-
-# WordPress is a free, open-source content management
-# system (CMS) that allows you to create and manage websites easily
-# It’s written in PHP and uses a MySQL or MariaDB database.
-
-
-# PHP-FPM stands for PHP FastCGI Process Manager.
-# It is a high-performance PHP handler used by web servers like NGINX and Apache to
-# run PHP scripts efficiently — especially for dynamic
-# websites like WordPress, Laravel, or custom PHP apps.
-
-# Docker volumes are a way to persist data generated and used by containers.
-# Unlike container filesystems (which are ephemeral), volumes store data 
-# outside the container's writable layer, so data is not lost when the container is removed or recreated.
-
-
-# MariaDB is a free, open-source relational database management system (RDBMS)
-# that is a drop-in replacement for MySQL. It was created by the original
-# developers of MySQL after concerns about Oracle’s acquisition of MySQL in 2010.
-
-
-
-
-
-
-# Namespaces are a Linux kernel feature that allow a process (or group of processes) \
-      # to have its own isolated view of some part of the system — like processes, filesystems, networks, etc.
-
-# pid : Container sees only its own processes
-# mnt : Different containers mount different dirs
-# net (Network interfaces)  : Each container has its own eth0, ports
-# uts : Containers can have custom hostnames and domain names
-
-# Each container can have:
-# Its own eth0
-# Separate IP address (e.g., 172.18.0.2)
-# Own routing table and firewall rules
-
-
-# docker uses unshare to create namespaces
-
-# PID 1 is the first process launched inside the container, and it has a special role, just like PID 1 on a full Linux system.
-# It is the main process that Docker runs via CMD or ENTRYPOINT.
-
-
-# 🧑‍💻 Example Flow: docker run nginx
-# Docker CLI sends command to dockerd
-# Daemon pulls the nginx image (if not local)
-# containerd starts a container
-# runc creates namespaces, mounts FS, starts PID 1
-# Container is live with its own isolated environment
-
-
-
-
-# Why not just stick with VMs
-# Reason	Explanation
-# Performance overhead	Each VM runs a full OS, which uses more RAM, CPU, and disk. Containers are lighter — they share the host OS kernel.
-# Startup time	VMs can take tens of seconds to minutes to boot. Containers start in less than a second.
-# Density	You can run hundreds of containers on one host, but only a few VMs due to resource constraints.
-# Portability	Docker images are layered, easy to build/share, and can run anywhere — dev → test → prod.
-
-

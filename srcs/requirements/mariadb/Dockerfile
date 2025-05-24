@@ -9,6 +9,4 @@ COPY tools/script.sh /
 
 RUN chmod +x script.sh
 
-EXPOSE 3306
-
 ENTRYPOINT [ "/script.sh" ]

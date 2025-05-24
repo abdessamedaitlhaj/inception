@@ -4,12 +4,11 @@ MARIADB_PATH = "/home/aait-lha/data/mariadb"
 RM =rm -rf
 GREEN=\033[0;32m
 NC=\033[0m
-BOLD=\033[1m
 
 all: up
 
 up:
-	@echo "$(GREEN)$(BOLD)Building and starting services with Docker Compose...$(NC)"
+	@echo "$(GREEN)Building and starting services with Docker Compose...$(NC)"
 	@mkdir -p ${WORDPRESS_PATH}
 	@mkdir -p ${MARIADB_PATH}
 	@docker compose -f $(COMPOSE_FILE) up --build
